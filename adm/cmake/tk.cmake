@@ -1,5 +1,15 @@
 # tk
 
+string(ASCII 27 Esc)
+
+set(RED "${Esc}[0;31m") # Red
+set(GRE "${Esc}[0;32m") # Green
+set(YEL "${Esc}[0;33m") # Yellow
+set(BLU "${Esc}[0;34m") # Blue
+set(PUR "${Esc}[0;35m") # Pur
+set(CYA "${Esc}[0;36m") # Dark Green
+set(E "${Esc}[m")
+
 if (NOT DEFINED INSTALL_TK AND BUILD_SHARED_LIBS)
   set (INSTALL_TK OFF CACHE BOOL "${INSTALL_TK_DESCR}")
 endif()
@@ -130,10 +140,15 @@ if (BUILD_SHARED_LIBS)
     endif()
   endif()
 
-  set (3RDPARTY_TK_LIBRARY_VERSION "")
   if (3RDPARTY_TK_LIBRARY AND EXISTS "${3RDPARTY_TK_LIBRARY}")
+
+    set (TK_LIBRARY_VERSION "${3RDPARTY_TK_LIBRARY_VERSION}")
+
     get_filename_component (TK_LIBRARY_NAME "${3RDPARTY_TK_LIBRARY}" NAME)
-    string(REGEX REPLACE "^.*tk([0-9]\\.*[0-9]).*$" "\\1" TK_LIBRARY_VERSION "${TK_LIBRARY_NAME}")
+
+    message (STATUS "INSTALL_TK:" ${INSTALL_TK})
+    message (STATUS ${YEL}"3RDPARTY_TK_LIBRARY:"${E} ${3RDPARTY_TK_LIBRARY})
+    message (STATUS ${YEL}"TK_LIBRARY_VERSION:"${E} ${TK_LIBRARY_VERSION})
 
     if (NOT "${TK_LIBRARY_VERSION}" STREQUAL "${TK_LIBRARY_NAME}")
       set (3RDPARTY_TK_LIBRARY_VERSION "${TK_LIBRARY_VERSION}")

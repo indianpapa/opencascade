@@ -1,5 +1,15 @@
 # tcl
 
+string(ASCII 27 Esc)
+
+set(RED "${Esc}[0;31m") # Red
+set(GRE "${Esc}[0;32m") # Green
+set(YEL "${Esc}[0;33m") # Yellow
+set(BLU "${Esc}[0;34m") # Blue
+set(PUR "${Esc}[0;35m") # Pur
+set(CYA "${Esc}[0;36m") # Dark Green
+set(E "${Esc}[m")
+
 if (NOT DEFINED INSTALL_TCL)
   set (INSTALL_TCL OFF CACHE BOOL "${INSTALL_TCL_DESCR}")
 endif()
@@ -121,10 +131,15 @@ if (NOT 3RDPARTY_TCL_LIBRARY)
   endif()
 endif()
 
-set (3RDPARTY_TCL_LIBRARY_VERSION "")
 if (3RDPARTY_TCL_LIBRARY AND EXISTS "${3RDPARTY_TCL_LIBRARY}")
+
+  set (TCL_LIBRARY_VERSION "${3RDPARTY_TCL_LIBRARY_VERSION}")
+
   get_filename_component (TCL_LIBRARY_NAME "${3RDPARTY_TCL_LIBRARY}" NAME)
-  string(REGEX REPLACE "^.*tcl([0-9]\\.*[0-9]).*$" "\\1" TCL_LIBRARY_VERSION "${TCL_LIBRARY_NAME}")
+  
+  message (STATUS "INSTALL_TCL:" ${INSTALL_TCL})
+  message (STATUS ${YEL}"3RDPARTY_TCL_LIBRARY:"${E} ${3RDPARTY_TCL_LIBRARY})
+  message (STATUS ${YEL}"TCL_LIBRARY_VERSION:"${E} ${3RDPARTY_TCL_LIBRARY_VERSION})
 
   if (NOT "${TCL_LIBRARY_VERSION}" STREQUAL "${TCL_LIBRARY_NAME}")
     set (3RDPARTY_TCL_LIBRARY_VERSION "${TCL_LIBRARY_VERSION}")

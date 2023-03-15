@@ -1,5 +1,15 @@
 # script for each OCCT toolkit
 
+string(ASCII 27 Esc)
+
+set(RED "${Esc}[0;31m") # Red
+set(GRE "${Esc}[0;32m") # Green
+set(YEL "${Esc}[0;33m") # Yellow
+set(BLU "${Esc}[0;34m") # Blue
+set(PUR "${Esc}[0;35m") # Pur
+set(CYA "${Esc}[0;36m") # Dark Green
+set(E "${Esc}[m")
+
 # filling some variables by default values(src) or using custom(tools, samples)
 set (RELATIVE_SOURCES_DIR "${RELATIVE_DIR}")
 if ("${RELATIVE_SOURCES_DIR}" STREQUAL "")
@@ -22,11 +32,15 @@ if ("${OCCT_TOOLKITS_NAME_SUFFIX}" STREQUAL "")
   set (OCCT_TOOLKITS_NAME_SUFFIX "TOOLKITS")
 endif()
 
+message("${YEL}------------------------${PROJECT_NAME}----------------------------${E}")
+
 # parse PACKAGES file
 FILE_TO_LIST ("${RELATIVE_SOURCES_DIR}/${PROJECT_NAME}/PACKAGES" USED_PACKAGES)
 if ("${USED_PACKAGES}" STREQUAL "")
   set (USED_PACKAGES ${PROJECT_NAME})
 endif()
+
+message("  > ${GRE}Pkgs:${E} ${USED_PACKAGES}")
 
 if (USE_QT)
   # Qt dependencies
@@ -345,6 +359,9 @@ if (CUSTOM_EXTERNLIB)
 else()
   FILE_TO_LIST ("${RELATIVE_SOURCES_DIR}/${PROJECT_NAME}/EXTERNLIB" USED_EXTERNLIB_AND_TOOLKITS)
 endif()
+
+message("  > ${PUR}Libs:${E} ${USED_EXTERNLIB_AND_TOOLKITS}")
+
 foreach (USED_ITEM ${USED_EXTERNLIB_AND_TOOLKITS})
   string (REGEX MATCH "^ *#" COMMENT_FOUND ${USED_ITEM})
   if (NOT COMMENT_FOUND)
@@ -352,16 +369,19 @@ foreach (USED_ITEM ${USED_EXTERNLIB_AND_TOOLKITS})
     string (REGEX MATCH "^vtk" VTK_FOUND ${USED_ITEM})
     
     if (NOT "${TK_FOUND}" STREQUAL "" OR NOT "${VTK_FOUND}" STREQUAL "")
+      # TK_XX, VTK_XX extern lib
       list (APPEND USED_TOOLKITS_BY_CURRENT_PROJECT ${USED_ITEM})
       if (NOT "${VTK_FOUND}" STREQUAL "" AND BUILD_SHARED_LIBS AND INSTALL_VTK AND COMMAND OCCT_INSTALL_VTK)
         OCCT_INSTALL_VTK(${USED_ITEM})
       endif()
     else()
+      
       string (REGEX MATCH "^CSF_" CSF_FOUND ${USED_ITEM})
       if ("${CSF_FOUND}" STREQUAL "")
         message (STATUS "Info: ${USED_ITEM} from ${PROJECT_NAME} skipped due to it is empty")
       else() # get CSF_ value
         set (CURRENT_CSF ${${USED_ITEM}})
+        message("  >> ${BLU}${USED_ITEM}${E} -> ${CURRENT_CSF}")
         if (NOT "x${CURRENT_CSF}" STREQUAL "x")
           if ("${CURRENT_CSF}" STREQUAL "${CSF_OpenGlLibs}")
             add_definitions (-DHAVE_OPENGL)
@@ -375,7 +395,9 @@ foreach (USED_ITEM ${USED_EXTERNLIB_AND_TOOLKITS})
             set (USED_DRACO 1)
           endif()
           set (LIBRARY_FROM_CACHE 0)
+
           separate_arguments (CURRENT_CSF)
+
           foreach (CSF_LIBRARY ${CURRENT_CSF})
             string (TOLOWER "${CSF_LIBRARY}" CSF_LIBRARY)
             string (REPLACE "+" "[+]" CSF_LIBRARY "${CSF_LIBRARY}")
@@ -401,9 +423,9 @@ foreach (USED_ITEM ${USED_EXTERNLIB_AND_TOOLKITS})
             endforeach()
           endforeach()
 
-          if (NOT ${LIBRARY_FROM_CACHE} AND NOT "${CURRENT_CSF}" STREQUAL "")
+          if (NOT ${LIBRARY_FROM_CACHE} AND NOT "${CURRENT_CSF}" STREQUAL "") 
             # prepare a list from a string with whitespaces
-            separate_arguments (CURRENT_CSF)
+            separate_arguments (CURRENT_CSF) 
             list (APPEND USED_EXTERNAL_LIBS_BY_CURRENT_PROJECT ${CURRENT_CSF})
           endif()
         endif()
